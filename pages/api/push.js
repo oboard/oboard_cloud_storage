@@ -19,7 +19,7 @@ export default function handler(req, res) {
   // 读取log.json
   let log = [];
   try {
-    log = JSON.parse(fs.readFileSync("./log.json"));
+    log = JSON.parse(fs.readFileSync("./data/log.json"));
   } catch (error) {
     // 如果文件不存在，就创建一个空数组
     log = [];
