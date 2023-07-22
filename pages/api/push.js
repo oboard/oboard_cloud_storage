@@ -6,8 +6,15 @@ export default function handler(req, res) {
   // 将key和value存入本地文件，使用fs模块
   const fs = require("fs");
   // 将字符串写入本地文件
-  fs.writeFileSync(`./${key}.txt`, value.toString());
-
+  // md5加密key
+  const crypto = require("crypto");
+  const md5 = crypto.createHash("md5");
+  // data文件夹可能不存在，需要创建
+  if (!fs.existsSync("./data")) {
+    fs.mkdirSync("./data");
+  }
+  fs.writeFileSync( "./data/" + md5.update(key).digest("hex") + ".txt", value);
+  
   // 写入log.json，这个文件有可能不存在
   // 读取log.json
   let log = [];

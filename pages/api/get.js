@@ -6,7 +6,10 @@ export default function handler(req, res) {
   // 将key和value存入本地文件，使用fs模块
   const fs = require("fs");
   // 读取本地文件
-  const data = fs.readFileSync(`./${key}.txt`);
+
+  const crypto = require("crypto");
+  const md5 = crypto.createHash("md5");
+  const data = fs.readFileSync(`./data/${md5.update(key).digest("hex")}.txt`);
   // 返回数据
   res
     .status(200)

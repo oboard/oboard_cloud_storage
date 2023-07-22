@@ -1,38 +1,94 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# oboard临时存储云
+采用Next.js
 
-## Getting Started
+## API文档
+### 1. 写入数据
+#### 1.1. 接口地址
+```
+POST /api/push
+```
+#### 1.2. 请求参数
+| 参数名 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| key | string | 是 | 要写入的key |
+| value | string | 是 | 要写入的数据 |
 
-First, run the development server:
+#### 1.3. 返回参数
+| 参数名 | 类型 | 说明 |
+| --- | --- | --- |
+| code | number | 状态码 |
+| message | string | 提示信息 |
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
+#### 1.4. 示例
+##### 1.4.1. 请求
+```
+POST /api/push
+```
+```json
+{
+    "key": "test",
+    "value": "hello world"
+    }
+    ```
+##### 1.4.2. 返回
+```json
+{
+    "code": 200,
+    "message": "success"
+}
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. 读取数据
+#### 2.1. 接口地址
+```
+GET /api/get
+```
+#### 2.2. 请求参数
+| 参数名 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| key | string | 是 | 要读取的key |
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+#### 2.3. 返回参数
+| 参数名 | 类型 | 说明 |
+| --- | --- | --- |
+| code | number | 状态码 |
+| message | string | 提示信息 |
+| data | string | 读取到的数据 |
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
+#### 2.4. 示例
+##### 2.4.1. 请求
+```
+GET /api/get?key=test
+```
+##### 2.4.2. 返回
+```json
+{
+    "code": 200,
+    "message": "success",
+    "data": "hello world"
+}
+```
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+## 部署
+### 1. 安装依赖
+```
+npm install
+```
+### 2. 启动服务
+```
+npm run start
+```
+### 3. 访问
+```
+http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+## 说明
+### 1. 服务端口
+默认端口为3000，可在根目录下的.env文件中修改
+```
+PORT=3000
+```
+### 2. 数据存储
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+数据存储在根目录下的data文件夹中，每个key对应一个文件，文件名为key的md5值，文件内容为value
