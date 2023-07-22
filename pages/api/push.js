@@ -1,6 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-export const memory = {};
-export const log = [];
+export let memory = {};
+export let log = [];
 export default function handler(req, res) {
   // 解析请求中的body，body中有key和value两个值
   const { key, value } = req.body;
@@ -18,6 +18,11 @@ export default function handler(req, res) {
     time: new Date().toLocaleString(),
   });
   console.log(log);
+
+  setInterval(() => {
+    log = log;
+    memory = memory;
+  }, 1000 * 60 * 60 * 24 * 7);
 
   // 返回成功
   res

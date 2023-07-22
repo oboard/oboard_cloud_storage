@@ -10,5 +10,5 @@ export default function handler(req, res) {
   res
     .status(200)
     .setHeader("Access-Control-Allow-Origin", "*")
-    .json({ message: "success", data: data.toString() });
+    .json({ message: "success", data: data });
 }
