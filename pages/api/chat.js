@@ -15,6 +15,11 @@ export default function handler(req, res) {
     // 把信息存入内存
     if (req.body !== undefined || req.body !== null) messages.push(req.body);
 
+    // 保活处理
+    setInterval(() => {
+        messages = messages;
+    }, 1000 * 60 * 60 * 24 * 7); 
+
     // 返回成功
     res
       .status(200)
