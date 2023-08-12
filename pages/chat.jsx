@@ -29,7 +29,7 @@ export default function Chat() {
   // 使用daisyUI和tailwindcss
   let [messages, setMessages] = useState([]);
   let [message, setMessage] = useState("");
-  let [uuid, setUuid] = useState("");
+  let [userId, setUserId] = useState("");
 
   // 先生成一个uuid
   let genUuid = () => {
@@ -50,16 +50,57 @@ export default function Chat() {
 
   // 生成uuid
   useEffect(() => {
-    setUuid(genUuid());
+    // 先从localStorage中获取
+    let userId = localStorage.getItem("userId");
+    if (userId !== undefined && userId !== null) {
+      setUserId(userId);
+      return;
+    }
+    setUserId(genUuid());
+
+    // 保存到localStorage中
+    localStorage.setItem("userId", userId);
   }, []);
 
   // 设置定时拉去信息
   useEffect(() => {
     let timer = setInterval(() => {
-      fetch("http://localhost:3000/api/chat")
+      fetch("/api/chat")
         .then((res) => res.json())
         .then((data) => {
-          setMessages(data.data);
+          let temp = [...messages];
+          // 如果data不是空的
+          if (data.data !== undefined && data.data !== null) {
+            temp = [...temp, ...data.data];
+            // 去重
+            temp = temp.filter((item, index) => {
+              return (
+                temp.findIndex((item2) => {
+                  return item.id === item2.id;
+                }) === index
+              );
+            });
+
+            // 筛选出服务器没有但本地有的信息
+            let syncMessages = temp.filter((item) => {
+              return (
+                data.data.findIndex((item2) => {
+                  return item.id === item2.id;
+                }) === -1
+              );
+            });
+            // 如果有，就发送给服务器
+            if (syncMessages.length > 0) {
+              fetch("/api/chat", {
+                method: "POST",
+                body: JSON.stringify(syncMessages),
+                headers: {
+                  "Content-Type": "application/json",
+                },
+              });
+            }
+          }
+          setMessages(temp);
         });
     }, 1000);
     return () => {
@@ -71,16 +112,17 @@ export default function Chat() {
   let sendMessage = () => {
     let time = new Date().toLocaleString();
     let msg = {
-      id: uuid,
+      id: genUuid(),
+      userId: userId,
       content: message,
       time: time,
     };
     // 直接插入到数组中
     messages.push(msg);
     // 发送信息
-    fetch("http://localhost:3000/api/chat", {
+    fetch("/api/chat", {
       method: "POST",
-      body: JSON.stringify(msg),
+      body: JSON.stringify([msg]),
       headers: {
         "Content-Type": "application/json",
       },
@@ -92,6 +134,7 @@ export default function Chat() {
   // 信息的结构
   // {
   //     id: "uuid",
+  //     userId: "uuid",
   //     content: "message",
   //     time: "time",
   // }
@@ -107,19 +150,19 @@ export default function Chat() {
               key={index}
               className={
                 "flex flex-col gap-1 px-2" +
-                (item.id === uuid ? " items-end" : " items-start")
+                (item.userId === userId ? " items-end" : " items-start")
               }
             >
               <div
                 className={
                   "flex flex-col gap-1" +
-                  (item.id === uuid ? " items-end" : " items-start")
+                  (item.userId === userId ? " items-end" : " items-start")
                 }
               >
                 <div
                   className={
                     "rounded-md px-2 py-1" +
-                    (item.id === uuid
+                    (item.userId === userId
                       ? " bg-blue-600 text-white"
                       : " bg-gray-200 text-gray-700")
                   }
