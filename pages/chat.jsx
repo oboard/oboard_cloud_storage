@@ -52,7 +52,7 @@ export default function Chat() {
   useEffect(() => {
     // 先从localStorage中获取
     let userId = localStorage.getItem("userId");
-    if (userId !== undefined && userId !== null && userId !== "") {
+    if (userId !== undefined && userId !== null && userId.length > 5) {
       setUserId(userId);
       return;
     }
