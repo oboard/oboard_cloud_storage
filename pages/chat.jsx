@@ -48,23 +48,31 @@ export default function Chat() {
     return uuid;
   };
 
-  // 生成uuid
-  useEffect(() => {
+  const genUserId = () => {
+
     // 先从localStorage中获取
     let userId = localStorage.getItem("userId");
     if (userId !== undefined && userId !== null && userId.length > 5) {
       setUserId(userId);
       return;
     }
+    // 如果没有，就生成一个
     setUserId(genUuid());
 
     // 保存到localStorage中
     localStorage.setItem("userId", userId);
-  }, []);
+};
+
+//   // 生成uuid
+//   useEffect(() => {
+//   }, []);
 
   // 设置定时拉去信息
   useEffect(() => {
     let timer = setInterval(() => {
+        
+        genUserId();
+
       fetch("/api/chat")
         .then((res) => res.json())
         .then((data) => {
