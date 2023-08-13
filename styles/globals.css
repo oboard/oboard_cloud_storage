@@ -26,3 +26,8 @@ body {
     )
     rgb(var(--background-start-rgb));
 }
+
+/* 所有图片圆角裁切 */
+img {
+  border-radius: 0.25rem;
+}

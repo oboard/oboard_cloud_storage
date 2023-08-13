@@ -1,4 +1,21 @@
 import { useEffect, useState } from "react";
+import ReactMarkdown from "react-markdown";
+import SyntaxHighlighter from "react-syntax-highlighter";
+import { darcula } from "react-syntax-highlighter/dist/cjs/styles/prism";
+
+const CodeBlock = ({ language, children }) => {
+  return (
+    <SyntaxHighlighter
+      showLineNumbers={true}
+      wrapLines={true}
+      PreTag="div"
+      language={language}
+      style={darcula}
+    >
+      {children}
+    </SyntaxHighlighter>
+  );
+};
 
 const useLocalStorage = (storageKey, fallbackState) => {
   if (typeof window !== "undefined") {
@@ -61,6 +78,8 @@ export default function Chat() {
   const [input, setInput] = useLocalStorage("input", "");
   const [userId, setUserId] = useLocalStorage("userId", genUuid());
 
+  let first = true;
+
   // 设置定时拉去信息
   useEffect(() => {
     let timer = setInterval(() => {
@@ -82,12 +101,10 @@ export default function Chat() {
                 );
               });
 
-
               // 过滤掉空信息
               temp = temp.filter((item) => {
-                return item.content !== '';
+                return item.content !== "";
               });
-
 
               // 筛选出服务器没有但本地有的信息
               let syncMessages = temp.filter((item) => {
@@ -125,6 +142,11 @@ export default function Chat() {
             });
 
             setMessages(temp);
+            if (first) {
+              // 等待页面更新后，页面自动滚动到底部
+              document.querySelector(".chatbox").scrollTo(0, 999999);
+              first = false;
+            }
           });
       } catch (error) {
         console.log(error);
@@ -203,13 +225,53 @@ export default function Chat() {
                 >
                   <div
                     className={
-                      "rounded-md px-2 py-1" +
+                      "rounded-md p-2 max-w-md" +
                       (item.userId === userId
                         ? " bg-primary text-primary-content"
                         : " bg-base-200 text-base-content")
                     }
                   >
-                    {item.content}
+                    {/* 以markdown展示 */}
+                    <ReactMarkdown
+                      components={{
+                        code({ node, inline, className, children, ...props }) {
+                          const match = /language-(\w+)/.exec(className || "");
+                          return !inline && match ? (
+                            <CodeBlock language={match[1]}>
+                              {String(children).replace(/\n$/, "")}
+                            </CodeBlock>
+                          ) : (
+                            <code className={className} {...props}>
+                              {children}
+                            </code>
+                          );
+                        },
+                        // 链接
+                        a({ node, inline, className, children, ...props }) {
+                          return (
+                           <div className="flex flex-row gap-1 items-center">
+                            {/* 链接图标 */}
+                            <svg
+                            // 颜色
+                              className={(item.userId === userId
+                                ? "text-primary-content"
+                                : "text-base-content") + " fill-current"}
+                            viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" width="16" height="16"><path d="M573.44 640a187.68 187.68 0 0 1-132.8-55.36L416 560l45.28-45.28 24.64 24.64a124.32 124.32 0 0 0 170.08 5.76l1.44-1.28a49.44 49.44 0 0 0 4-3.84l101.28-101.28a124.16 124.16 0 0 0 0-176l-1.92-1.92a124.16 124.16 0 0 0-176 0l-51.68 51.68a49.44 49.44 0 0 0-3.84 4l-20 24.96-49.92-40L480 276.32a108.16 108.16 0 0 1 8.64-9.28l51.68-51.68a188.16 188.16 0 0 1 266.72 0l1.92 1.92a188.16 188.16 0 0 1 0 266.72l-101.28 101.28a112 112 0 0 1-8.48 7.84 190.24 190.24 0 0 1-125.28 48z"></path><path d="M350.72 864a187.36 187.36 0 0 1-133.28-55.36l-1.92-1.92a188.16 188.16 0 0 1 0-266.72l101.28-101.28a112 112 0 0 1 8.48-7.84 188.32 188.32 0 0 1 258.08 7.84L608 464l-45.28 45.28-24.64-24.64A124.32 124.32 0 0 0 368 478.88l-1.44 1.28a49.44 49.44 0 0 0-4 3.84l-101.28 101.28a124.16 124.16 0 0 0 0 176l1.92 1.92a124.16 124.16 0 0 0 176 0l51.68-51.68a49.44 49.44 0 0 0 3.84-4l20-24.96 50.08 40-20.8 25.12a108.16 108.16 0 0 1-8.64 9.28l-51.68 51.68A187.36 187.36 0 0 1 350.72 864z" p-id="4051"></path></svg>
+                             <a
+                              className="link-hover"
+                              target="_blank"
+                              {...props}
+                            >
+                              {children}
+                            </a>
+                           </div>
+                          );
+                        }
+                      }}
+                    >
+                      {item.content}
+                    </ReactMarkdown>
+                    {/* {item.content} */}
                   </div>
                   <div className="text-gray-400 text-xs">
                     {
@@ -225,20 +287,22 @@ export default function Chat() {
           </div>
         </div>
         <div className="flex flex-row items-center gap-2 px-2 py-1 flex-shrink-0">
-          <input
-            className="input input-bordered flex-grow"
-            type="text"
+          {/* // 要支持多行输入，按Shift+Enter 或者Ctrl+Enter换行 */}
+          <textarea
+            className="textarea textarea-bordered flex-grow"
             value={input}
-            // 回车发送信息
             onKeyDown={(e) => {
-              if (e.key === "Enter") {
+              if (e.key === "Enter" && (e.ctrlKey || e.shiftKey)) {
+                setInput(input + "\n");
+              } else if (e.key === "Enter") {
                 sendMessage();
               }
             }}
             onChange={(e) => {
               setInput(e.target.value);
             }}
-          />
+          ></textarea>
+
           <button
             className="btn btn-primary"
             onClick={() => {
