@@ -175,7 +175,7 @@ export default function Chat() {
 
   return (
     <>
-      <div className="h-full flex flex-col">
+      <div className="h-screen flex flex-col">
         <div className="flex-grow flex flex-col h-1">
           <div className="chatbox flex-grow flex flex-col overflow-y-auto p-4">
             {messages.map((item, index) => (
