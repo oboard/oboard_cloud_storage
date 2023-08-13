@@ -300,7 +300,7 @@ export default function Chat() {
           </svg>
         </button>
       </div>
-      <div className="h-screen flex flex-col">
+      <div>
         {/* 底部需要空出一些距离 */}
         <div className="flex-grow flex flex-col h-1 w-full">
           <div className="chatbox flex-grow flex flex-col p-4 pb-32">
