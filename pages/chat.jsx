@@ -72,13 +72,13 @@ export default function Chat() {
             let temp = [...messages];
             // 如果data不是空的
             if (data.data !== undefined && data.data !== null) {
-              temp = [...temp, ...data.data];
+              temp = [...data.data, ...temp];
               // 去重
               temp = temp.filter((item, index) => {
                 return (
                   temp.findIndex((item2) => {
                     return item.id === item2.id;
-                  }) === index
+                  }) === index && item.length != 0
                 );
               });
 
@@ -87,7 +87,7 @@ export default function Chat() {
                 return (
                   data.data.findIndex((item2) => {
                     return item.id === item2.id;
-                  }) === -1
+                  }) === -1 && item.length != 0
                 );
               });
               // 如果超过一百条只发送后面100条
@@ -130,6 +130,8 @@ export default function Chat() {
 
   // 发送信息
   let sendMessage = () => {
+    if (input.length == 0) return;
+
     //   // 生成userId
     if (userId == undefined || userId == null || userId.length < 5) {
       // 如果没有，就生成一个
@@ -173,7 +175,7 @@ export default function Chat() {
 
   return (
     <>
-      <div className="h-screen flex flex-col">
+      <div className="h-full flex flex-col">
         <div className="flex-grow flex flex-col h-1">
           <div className="chatbox flex-grow flex flex-col overflow-y-auto p-4">
             {messages.map((item, index) => (

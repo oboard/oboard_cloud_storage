@@ -19,7 +19,7 @@ export default function handler(req, res) {
     messages = [...messages, ...req.body]
     // 要通过比对uuid来判断是否重复
     messages = messages.filter((item, index, arr) => {
-        return arr.findIndex((item2) => item2.id === item.id) === index;
+        return arr.findIndex((item2) => item2.id === item.id) === index && item.length != 0;
     })
 
     messages.forEach((item) => {
