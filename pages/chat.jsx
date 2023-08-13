@@ -80,7 +80,6 @@ export default function Chat() {
   const [following, setFollowing] = useState(true);
   let first = true;
 
-
   /* 不允许页面缩放 */
   useEffect(() => {
     document.addEventListener("touchstart", function (event) {
@@ -107,8 +106,27 @@ export default function Chat() {
       },
       false
     );
-  }, []);
 
+    // 检查颜色模式
+    let checkColorScheme = () => {
+       // 根据系统主题切换浅色和深色模式
+        // 使用daisyUI
+        if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+          document.querySelector("html").setAttribute("data-theme", "dark");
+        } else {
+          document.querySelector("html").setAttribute("data-theme", "winter");
+        }
+    }
+
+    checkColorScheme();
+
+    // 当系统颜色发生变化
+    window
+      .matchMedia("(prefers-color-scheme: dark)")
+      .addEventListener("change", (e) => {
+       checkColorScheme();
+      });
+  }, []);
 
   // 设置定时拉去信息
   useEffect(() => {
@@ -300,10 +318,10 @@ export default function Chat() {
           </svg>
         </button>
       </div>
-      <div>
+      <div className="flex flex-col">
         {/* 底部需要空出一些距离 */}
-        <div className="flex-grow flex flex-col h-1 w-full">
-          <div className="chatbox flex-grow flex flex-col p-4 pb-32">
+        <div className="flex-grow flex flex-col h-screen w-full">
+          <div className="chatbox flex-grow flex overflow-y-scroll flex-col p-4 pb-32">
             {messages.map((item, index) => (
               // 模仿微信的样式,有气泡的感觉，要显示时间
               // 要根据uuid判断是否是自己发的，如果是自己发的靠右，别人发的靠左
