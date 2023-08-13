@@ -19,8 +19,13 @@ export default function handler(req, res) {
     messages = [...messages, ...req.body]
     // 要通过比对uuid来判断是否重复
     messages = messages.filter((item, index, arr) => {
-        return arr.findIndex((item2) => item2.id === item.id) === index && item.length != 0;
+        return arr.findIndex((item2) => item2.id === item.id) === index;
     })
+
+    // 过滤掉空信息
+    messages = messages.filter((item) => {
+        return item.content !== '';
+    });
 
     messages.forEach((item) => {
         if(typeof(item.time) === 'string' || item.time == undefined) {

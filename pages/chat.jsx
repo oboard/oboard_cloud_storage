@@ -78,16 +78,23 @@ export default function Chat() {
                 return (
                   temp.findIndex((item2) => {
                     return item.id === item2.id;
-                  }) === index && item.length != 0
+                  }) === index
                 );
               });
+
+
+              // 过滤掉空信息
+              temp = temp.filter((item) => {
+                return item.content !== '';
+              });
+
 
               // 筛选出服务器没有但本地有的信息
               let syncMessages = temp.filter((item) => {
                 return (
                   data.data.findIndex((item2) => {
                     return item.id === item2.id;
-                  }) === -1 && item.length != 0
+                  }) === -1
                 );
               });
               // 如果超过一百条只发送后面100条
