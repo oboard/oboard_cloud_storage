@@ -80,6 +80,36 @@ export default function Chat() {
   const [following, setFollowing] = useState(true);
   let first = true;
 
+
+  /* 不允许页面缩放 */
+  useEffect(() => {
+    document.addEventListener("touchstart", function (event) {
+      if (event.touches.length > 1) {
+        event.preventDefault();
+      }
+    });
+    let lastTouchEnd = 0;
+    document.addEventListener(
+      "touchend",
+      function (event) {
+        var now = new Date().getTime();
+        if (now - lastTouchEnd <= 300) {
+          event.preventDefault();
+        }
+        lastTouchEnd = now;
+      },
+      false
+    );
+    document.addEventListener(
+      "gesturestart",
+      function (event) {
+        event.preventDefault();
+      },
+      false
+    );
+  }, []);
+
+
   // 设置定时拉去信息
   useEffect(() => {
     let timer = setInterval(() => {
@@ -106,6 +136,17 @@ export default function Chat() {
                 return item.content !== "";
               });
 
+              temp.forEach((item) => {
+                if (typeof item.time === "string" || item.time == undefined) {
+                  // 时间戳
+                  item.time = new Date().getTime();
+                }
+              });
+              // 按照时间戳排序
+              temp.sort((a, b) => {
+                return a.time - b.time;
+              });
+
               // 筛选出服务器没有但本地有的信息
               let syncMessages = temp.filter((item) => {
                 return (
@@ -130,21 +171,13 @@ export default function Chat() {
               }
             }
 
-            temp.forEach((item) => {
-              if (typeof item.time === "string" || item.time == undefined) {
-                // 时间戳
-                item.time = new Date().getTime();
-              }
-            });
-            // 按照时间戳排序
-            temp.sort((a, b) => {
-              return a.time - b.time;
-            });
-
             setMessages(temp);
             if (first) {
               // 等待页面更新后，页面自动滚动到底部
-              document.querySelector(".chatbox").scrollTo(0, 999999);
+              document.querySelector(".chatbox").scrollTo({
+                top: document.querySelector(".chatbox").scrollHeight,
+                behavior: "smooth",
+              });
               first = false;
             }
           });
@@ -212,9 +245,12 @@ export default function Chat() {
       if (chatbox.scrollHeight - chatbox.scrollTop === chatbox.clientHeight) {
         setFollowing(true);
         // 定时滚动到底部
-        if(scrollTimer) clearTimeout(scrollTimer);
+        if (scrollTimer) clearTimeout(scrollTimer);
         scrollTimer = setInterval(() => {
-          document.querySelector(".chatbox").scrollTo(0, 999999);
+          document.querySelector(".chatbox").scrollTo({
+            top: document.querySelector(".chatbox").scrollHeight,
+            behavior: "smooth",
+          });
         }, 500);
       } else {
         setFollowing(false);
@@ -227,13 +263,18 @@ export default function Chat() {
   return (
     <>
       {/* 一个用于滚动到底部对悬浮按钮，如果following为false则显示 */}
-      <div className="fixed bottom-32 right-4 z-40">
+      {/* 底部剧中 */}
+      <div className="fixed bottom-32 z-40 left-1/2 transform -translate-x-1/2">
         <button
           className={
-            "btn btn-circle btn-accent flex items-center justify-center" + (following ? " hidden" : " block")
+            "btn btn-circle btn-accent flex items-center justify-center" +
+            (following ? " hidden" : " block")
           }
           onClick={() => {
-            document.querySelector(".chatbox").scrollTo(0, 999999);
+            document.querySelector(".chatbox").scrollTo({
+              top: document.querySelector(".chatbox").scrollHeight,
+              behavior: "smooth",
+            });
           }}
         >
           <svg
@@ -250,12 +291,10 @@ export default function Chat() {
           >
             <path
               d="M792.855154 465.805779c-6.240882-6.208198-14.368821-9.311437-22.560409-9.311437s-16.446822 3.168606-22.687703 9.440452L539.696922 673.674614 539.696922 108.393173c0-17.695686-14.336138-31.99914-32.00086-31.99914s-32.00086 14.303454-32.00086 31.99914l0 563.712619L269.455396 465.941675c-6.271845-6.208198-14.432469-9.34412-22.624056-9.34412-8.224271 0-16.417578 3.135923-22.65674 9.407768-12.511007 12.512727-12.480043 32.768069 0.032684 45.248112l259.328585 259.125601c3.264938 3.263217 7.104421 5.599247 11.136568 7.135385 3.999462 1.792447 8.351566 2.879613 13.023626 2.879613 1.119849 0 2.07972-0.543583 3.19957-0.639914 8.287918 0.063647 16.60852-3.008628 22.976697-9.407768L792.982449 511.053891C805.462492 498.542884 805.429808 478.254858 792.855154 465.805779z"
-             
               p-id="5073"
             ></path>
             <path
               d="M892.561322 875.531353c0 17.664722-14.303454 32.00086-31.99914 32.00086L156.562183 907.532213c-17.664722 0-32.00086-14.334417-32.00086-31.99914 0-17.664722 14.336138-32.00086 32.00086-32.00086l704 0C878.257869 843.532213 892.561322 857.866631 892.561322 875.531353z"
-            
               p-id="5074"
             ></path>
           </svg>
