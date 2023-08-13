@@ -4,8 +4,6 @@ export let messages = [];
 export default function handler(req, res) {
   // 如果是get
   if (req.method === "GET") {
-    // // 如果超过100条，删除100条之前的
-    // if (messages.length > 100) messages = messages.slice(100);
 
     // 返回数据
     res
@@ -35,6 +33,9 @@ export default function handler(req, res) {
         return a.time - b.time;
     });
     
+    
+    // 如果超过100条，删除100条之前的
+    if (messages.length > 100) messages = messages.slice(100);
     // 保活处理
     setInterval(() => {
         messages = messages;
