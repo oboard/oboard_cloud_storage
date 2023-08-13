@@ -177,7 +177,7 @@ export default function Chat() {
     <>
       <div className="h-screen flex flex-col">
         <div className="flex-grow flex flex-col h-1">
-          <div className="chatbox flex-grow flex flex-col overflow-y-auto p-4">
+          <div className="chatbox flex-grow flex flex-col overflow-y-scroll p-4">
             {messages.map((item, index) => (
               // 模仿微信的样式,有气泡的感觉，要显示时间
               // 要根据uuid判断是否是自己发的，如果是自己发的靠右，别人发的靠左
