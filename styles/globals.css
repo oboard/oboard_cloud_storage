@@ -24,6 +24,7 @@
 body {
   color: rgb(var(--foreground-rgb));
   background: rgb(var(--background-end-rgb));
+  zoom: 100%;
 }
 
 /* 所有图片圆角裁切 */
