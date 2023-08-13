@@ -2,11 +2,10 @@ import { useEffect, useState } from "react";
 
 const useLocalStorage = (storageKey, fallbackState) => {
   if (typeof window !== "undefined") {
-    
     const [value, setValue] = useState(
       JSON.parse(localStorage.getItem(storageKey)) || fallbackState
-      );
-      
+    );
+
     useEffect(() => {
       localStorage.setItem(storageKey, JSON.stringify(value));
     }, [value, storageKey]);
@@ -67,43 +66,47 @@ export default function Chat() {
     let timer = setInterval(() => {
       console.log(`userId: ${userId}`);
       try {
-      fetch("/api/chat")
-        .then((res) => res.json())
-        .then((data) => {
-          let temp = [...messages];
-          // 如果data不是空的
-          if (data.data !== undefined && data.data !== null) {
-            temp = [...temp, ...data.data];
-            // 去重
-            temp = temp.filter((item, index) => {
-              return (
-                temp.findIndex((item2) => {
-                  return item.id === item2.id;
-                }) === index
-              );
-            });
-
-            // 筛选出服务器没有但本地有的信息
-            let syncMessages = temp.filter((item) => {
-              return (
-                data.data.findIndex((item2) => {
-                  return item.id === item2.id;
-                }) === -1
-              );
-            });
-            // 如果有，就发送给服务器
-            if (syncMessages.length > 0) {
-              fetch("/api/chat", {
-                method: "POST",
-                body: JSON.stringify(syncMessages),
-                headers: {
-                  "Content-Type": "application/json",
-                },
+        fetch("/api/chat")
+          .then((res) => res.json())
+          .then((data) => {
+            let temp = [...messages];
+            // 如果data不是空的
+            if (data.data !== undefined && data.data !== null) {
+              temp = [...temp, ...data.data];
+              // 去重
+              temp = temp.filter((item, index) => {
+                return (
+                  temp.findIndex((item2) => {
+                    return item.id === item2.id;
+                  }) === index
+                );
               });
+
+              // 筛选出服务器没有但本地有的信息
+              let syncMessages = temp.filter((item) => {
+                return (
+                  data.data.findIndex((item2) => {
+                    return item.id === item2.id;
+                  }) === -1
+                );
+              });
+              // 如果超过一百条只发送后面100条
+              if (syncMessages.length > 100) {
+                syncMessages = syncMessages.slice(-100);
+              }
+              // 如果有，就发送给服务器
+              if (syncMessages.length > 0) {
+                fetch("/api/chat", {
+                  method: "POST",
+                  body: JSON.stringify(syncMessages),
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                });
+              }
             }
-          }
-          setMessages(temp);
-        });
+            setMessages(temp);
+          });
       } catch (error) {
         console.log(error);
       }
@@ -122,12 +125,12 @@ export default function Chat() {
       setUserId(genUuid());
     }
 
-    let time = new Date().toLocaleString();
+    // let time = new Date().toLocaleString();
     let msg = {
       id: genUuid(),
       userId: userId,
       content: input,
-      time: time,
+      // time: time,
     };
     // 直接插入到数组中
     messages.push(msg);
@@ -146,7 +149,6 @@ export default function Chat() {
     setTimeout(() => {
       document.querySelector(".chatbox").scrollTo(0, 999999);
     });
-
   };
 
   // 信息的结构
@@ -188,7 +190,12 @@ export default function Chat() {
                   >
                     {item.content}
                   </div>
-                  <div className="text-gray-400 text-xs">{item.time}</div>
+                  <div className="text-gray-400 text-xs">
+                    {
+                      // item.time是时间戳，转换为可读的时间字符串
+                      new Date(item.time || new Date().getTime()).toLocaleString()
+                    }
+                  </div>
                 </div>
               </div>
             ))}
