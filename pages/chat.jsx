@@ -205,8 +205,8 @@ export default function Chat() {
                     className={
                       "rounded-md px-2 py-1" +
                       (item.userId === userId
-                        ? " bg-blue-600 text-white"
-                        : " bg-gray-200 text-gray-700")
+                        ? " bg-primary text-primary-content"
+                        : " bg-base-200 text-base-content")
                     }
                   >
                     {item.content}
