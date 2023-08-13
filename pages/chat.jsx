@@ -301,8 +301,9 @@ export default function Chat() {
         </button>
       </div>
       <div className="h-screen flex flex-col">
-        <div className="flex-grow flex flex-col h-1">
-          <div className="chatbox flex-grow flex flex-col overflow-y-scroll p-4">
+        {/* 底部需要空出一些距离 */}
+        <div className="flex-grow flex flex-col h-1 w-full">
+          <div className="chatbox flex-grow flex flex-col p-4 pb-32">
             {messages.map((item, index) => (
               // 模仿微信的样式,有气泡的感觉，要显示时间
               // 要根据uuid判断是否是自己发的，如果是自己发的靠右，别人发的靠左
@@ -395,7 +396,7 @@ export default function Chat() {
             ))}
           </div>
         </div>
-        <div className="flex flex-row items-center gap-2 px-2 py-1 flex-shrink-0">
+        <div className="fixed bottom-0 left-0 right-0 flex flex-row gap-2 p-2 backdrop-filter backdrop-blur-lg bg-opacity-30 bg-base-100">
           {/* // 要支持多行输入，按Shift+Enter 或者Ctrl+Enter换行 */}
           <textarea
             className="textarea textarea-bordered flex-grow"
