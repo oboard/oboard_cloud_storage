@@ -77,7 +77,7 @@ export default function Chat() {
   const [messages, setMessages] = useLocalStorage("messages", []);
   const [input, setInput] = useLocalStorage("input", "");
   const [userId, setUserId] = useLocalStorage("userId", genUuid());
-
+  const [following, setFollowing] = useState(true);
   let first = true;
 
   // 设置定时拉去信息
@@ -202,8 +202,65 @@ export default function Chat() {
   //     time: "time",
   // }
 
+  let scrollTimer;
+
+  // 监听chatbox的滚动事件，如果滑动到底部，就设置following为true，否则为false
+  useEffect(() => {
+    let chatbox = document.querySelector(".chatbox");
+    chatbox.addEventListener("scroll", (e) => {
+      // 如果滑动到底部，就设置following为true，否则为false
+      if (chatbox.scrollHeight - chatbox.scrollTop === chatbox.clientHeight) {
+        setFollowing(true);
+        // 定时滚动到底部
+        if(scrollTimer) clearTimeout(scrollTimer);
+        scrollTimer = setInterval(() => {
+          document.querySelector(".chatbox").scrollTo(0, 999999);
+        }, 500);
+      } else {
+        setFollowing(false);
+        // 取消定时
+        clearTimeout(scrollTimer);
+      }
+    });
+  }, []);
+
   return (
     <>
+      {/* 一个用于滚动到底部对悬浮按钮，如果following为false则显示 */}
+      <div className="fixed bottom-32 right-4 z-40">
+        <button
+          className={
+            "btn btn-circle btn-accent flex items-center justify-center" + (following ? " hidden" : " block")
+          }
+          onClick={() => {
+            document.querySelector(".chatbox").scrollTo(0, 999999);
+          }}
+        >
+          <svg
+            t="1691916913457"
+            class="icon"
+            viewBox="0 0 1024 1024"
+            version="1.1"
+            xmlns="http://www.w3.org/2000/svg"
+            p-id="5072"
+            width="24"
+            height="24"
+            // 颜色
+            fill="currentColor"
+          >
+            <path
+              d="M792.855154 465.805779c-6.240882-6.208198-14.368821-9.311437-22.560409-9.311437s-16.446822 3.168606-22.687703 9.440452L539.696922 673.674614 539.696922 108.393173c0-17.695686-14.336138-31.99914-32.00086-31.99914s-32.00086 14.303454-32.00086 31.99914l0 563.712619L269.455396 465.941675c-6.271845-6.208198-14.432469-9.34412-22.624056-9.34412-8.224271 0-16.417578 3.135923-22.65674 9.407768-12.511007 12.512727-12.480043 32.768069 0.032684 45.248112l259.328585 259.125601c3.264938 3.263217 7.104421 5.599247 11.136568 7.135385 3.999462 1.792447 8.351566 2.879613 13.023626 2.879613 1.119849 0 2.07972-0.543583 3.19957-0.639914 8.287918 0.063647 16.60852-3.008628 22.976697-9.407768L792.982449 511.053891C805.462492 498.542884 805.429808 478.254858 792.855154 465.805779z"
+             
+              p-id="5073"
+            ></path>
+            <path
+              d="M892.561322 875.531353c0 17.664722-14.303454 32.00086-31.99914 32.00086L156.562183 907.532213c-17.664722 0-32.00086-14.334417-32.00086-31.99914 0-17.664722 14.336138-32.00086 32.00086-32.00086l704 0C878.257869 843.532213 892.561322 857.866631 892.561322 875.531353z"
+            
+              p-id="5074"
+            ></path>
+          </svg>
+        </button>
+      </div>
       <div className="h-screen flex flex-col">
         <div className="flex-grow flex flex-col h-1">
           <div className="chatbox flex-grow flex flex-col overflow-y-scroll p-4">
@@ -249,24 +306,37 @@ export default function Chat() {
                         // 链接
                         a({ node, inline, className, children, ...props }) {
                           return (
-                           <div className="flex flex-row gap-1 items-center">
-                            {/* 链接图标 */}
-                            <svg
-                            // 颜色
-                              className={(item.userId === userId
-                                ? "text-primary-content"
-                                : "text-base-content") + " fill-current"}
-                            viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" width="16" height="16"><path d="M573.44 640a187.68 187.68 0 0 1-132.8-55.36L416 560l45.28-45.28 24.64 24.64a124.32 124.32 0 0 0 170.08 5.76l1.44-1.28a49.44 49.44 0 0 0 4-3.84l101.28-101.28a124.16 124.16 0 0 0 0-176l-1.92-1.92a124.16 124.16 0 0 0-176 0l-51.68 51.68a49.44 49.44 0 0 0-3.84 4l-20 24.96-49.92-40L480 276.32a108.16 108.16 0 0 1 8.64-9.28l51.68-51.68a188.16 188.16 0 0 1 266.72 0l1.92 1.92a188.16 188.16 0 0 1 0 266.72l-101.28 101.28a112 112 0 0 1-8.48 7.84 190.24 190.24 0 0 1-125.28 48z"></path><path d="M350.72 864a187.36 187.36 0 0 1-133.28-55.36l-1.92-1.92a188.16 188.16 0 0 1 0-266.72l101.28-101.28a112 112 0 0 1 8.48-7.84 188.32 188.32 0 0 1 258.08 7.84L608 464l-45.28 45.28-24.64-24.64A124.32 124.32 0 0 0 368 478.88l-1.44 1.28a49.44 49.44 0 0 0-4 3.84l-101.28 101.28a124.16 124.16 0 0 0 0 176l1.92 1.92a124.16 124.16 0 0 0 176 0l51.68-51.68a49.44 49.44 0 0 0 3.84-4l20-24.96 50.08 40-20.8 25.12a108.16 108.16 0 0 1-8.64 9.28l-51.68 51.68A187.36 187.36 0 0 1 350.72 864z" p-id="4051"></path></svg>
-                             <a
-                              className="link-hover"
-                              target="_blank"
-                              {...props}
-                            >
-                              {children}
-                            </a>
-                           </div>
+                            <div className="flex flex-row gap-1 items-center">
+                              {/* 链接图标 */}
+                              <svg
+                                // 颜色
+                                className={
+                                  (item.userId === userId
+                                    ? "text-primary-content"
+                                    : "text-base-content") + " fill-current"
+                                }
+                                viewBox="0 0 1024 1024"
+                                version="1.1"
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="16"
+                                height="16"
+                              >
+                                <path d="M573.44 640a187.68 187.68 0 0 1-132.8-55.36L416 560l45.28-45.28 24.64 24.64a124.32 124.32 0 0 0 170.08 5.76l1.44-1.28a49.44 49.44 0 0 0 4-3.84l101.28-101.28a124.16 124.16 0 0 0 0-176l-1.92-1.92a124.16 124.16 0 0 0-176 0l-51.68 51.68a49.44 49.44 0 0 0-3.84 4l-20 24.96-49.92-40L480 276.32a108.16 108.16 0 0 1 8.64-9.28l51.68-51.68a188.16 188.16 0 0 1 266.72 0l1.92 1.92a188.16 188.16 0 0 1 0 266.72l-101.28 101.28a112 112 0 0 1-8.48 7.84 190.24 190.24 0 0 1-125.28 48z"></path>
+                                <path
+                                  d="M350.72 864a187.36 187.36 0 0 1-133.28-55.36l-1.92-1.92a188.16 188.16 0 0 1 0-266.72l101.28-101.28a112 112 0 0 1 8.48-7.84 188.32 188.32 0 0 1 258.08 7.84L608 464l-45.28 45.28-24.64-24.64A124.32 124.32 0 0 0 368 478.88l-1.44 1.28a49.44 49.44 0 0 0-4 3.84l-101.28 101.28a124.16 124.16 0 0 0 0 176l1.92 1.92a124.16 124.16 0 0 0 176 0l51.68-51.68a49.44 49.44 0 0 0 3.84-4l20-24.96 50.08 40-20.8 25.12a108.16 108.16 0 0 1-8.64 9.28l-51.68 51.68A187.36 187.36 0 0 1 350.72 864z"
+                                  p-id="4051"
+                                ></path>
+                              </svg>
+                              <a
+                                className="link-hover"
+                                target="_blank"
+                                {...props}
+                              >
+                                {children}
+                              </a>
+                            </div>
                           );
-                        }
+                        },
                       }}
                     >
                       {item.content}
@@ -296,6 +366,7 @@ export default function Chat() {
                 setInput(input + "\n");
               } else if (e.key === "Enter") {
                 sendMessage();
+                e.preventDefault();
               }
             }}
             onChange={(e) => {
