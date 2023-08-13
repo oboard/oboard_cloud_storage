@@ -241,8 +241,8 @@ export default function Chat() {
   useEffect(() => {
     let chatbox = document.querySelector(".chatbox");
     chatbox.addEventListener("scroll", (e) => {
-      // 如果滑动到底部，就设置following为true，否则为false
-      if (chatbox.scrollHeight - chatbox.scrollTop === chatbox.clientHeight) {
+      // 如果滑动到底部或者超过底部，就设置following为true，否则为false
+      if (chatbox.scrollHeight - chatbox.scrollTop <= chatbox.clientHeight) {
         setFollowing(true);
         // 定时滚动到底部
         if (scrollTimer) clearTimeout(scrollTimer);
