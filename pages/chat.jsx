@@ -227,7 +227,7 @@ export default function Chat() {
       // time: time,
     };
     // 直接插入到数组中
-    messages.push(msg);
+    setMessages([...messages, msg]);
     // 发送信息
     fetch("/api/chat", {
       method: "POST",
