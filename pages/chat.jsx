@@ -105,6 +105,18 @@ export default function Chat() {
                 });
               }
             }
+
+            temp.forEach((item) => {
+              if (typeof item.time === "string" || item.time == undefined) {
+                // 时间戳
+                item.time = new Date().getTime();
+              }
+            });
+            // 按照时间戳排序
+            temp.sort((a, b) => {
+              return a.time - b.time;
+            });
+
             setMessages(temp);
           });
       } catch (error) {
@@ -193,7 +205,9 @@ export default function Chat() {
                   <div className="text-gray-400 text-xs">
                     {
                       // item.time是时间戳，转换为可读的时间字符串
-                      new Date(item.time || new Date().getTime()).toLocaleString()
+                      new Date(
+                        item.time || new Date().getTime()
+                      ).toLocaleString()
                     }
                   </div>
                 </div>
