@@ -1,7 +1,7 @@
 import Image from "next/image";
 import React from "react";
 
-export default function Home() {
+export default function Log() {
   // 读取./log.json的内容，调用接口get_log.js
   const [log, setLog] = React.useState([]);
   React.useEffect(() => {
